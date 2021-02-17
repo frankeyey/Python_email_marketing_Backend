@@ -1,5 +1,7 @@
 var catcher = document.getElementById("catcher");
 
+var turndownService = new TurndownService()
+
 /* Hijack form data, use AJAX to send */
 catcher.addEventListener("submit", function(evnt) {
   showLoader();
@@ -8,7 +10,17 @@ catcher.addEventListener("submit", function(evnt) {
   let config = new Config();
   let request = new XMLHttpRequest();
   let subject_field = document.getElementById("subject_field").value;
-  let content_field = document.getElementById("input_content").value;
+
+  let trix_editor_nodes = document.getElementById("trixEditor").childNodes;
+  let trix_editor_count = document.getElementById("trixEditor").childElementCount
+
+  let content_field = "";
+
+  for (let i = 0; i < trix_editor_count; i++) {
+    let markdownContent = turndownService.turndown(trix_editor_nodes[i])
+    content_field += markdownContent
+  }
+
   let targets_csv = document.getElementById("dealCsv").files[0];
   let custom_attachment = document.getElementById("my-custom-attachment")
     .files[0];
@@ -16,7 +28,7 @@ catcher.addEventListener("submit", function(evnt) {
     'input[name="selected_header"]:checked'
   );
   selected_header = selected_header ? selected_header.value:'';
-  let submitBtn = document.getElementById("testBtn").value;
+  let submitBtn = document.getElementById("submitBtn").value;
 
   formData.append("subject_field", subject_field);
   formData.append("content_field", content_field);
@@ -25,6 +37,7 @@ catcher.addEventListener("submit", function(evnt) {
   formData.append("selected_header", selected_header);
   formData.append("submitBtn", submitBtn);
   config.mediaList.forEach(function(file) {
+    console.log("FILE: " + file)
     formData.append("media", file);
   });
 
@@ -41,19 +54,20 @@ catcher.addEventListener("submit", function(evnt) {
   request.send(formData);
 });
 
-/* Method to see the sample output */
-function seeOutput() {
+addEventListener("trix-change", function() {
+  viewOutput()
+})
+
+function viewOutput() {
+  checkEmptyField()
   let config = new Config();
   let output = document.getElementById("output_content");
-  let input = document
-    .getElementById("input_content")
-    .value.split("\n")
-    .join("<br>");
+  let input = element.editor.getDocument().toString();
   output.style.display = "block";
 
   for (let i = 0; i < config.csvFormatedHeader.length; i++) {
     //Replace each ${} with respective sample data
-    var searchString = input.search(config.csvFormatedHeader[i]); //Check if any ${} exist
+    // var searchString = input.search(config.csvFormatedHeader[i]); //Check if any ${} exist
     var changeVariable = input
       .split(config.csvFormatedHeader[i])
       .join(config.csvData[i]);
@@ -62,21 +76,16 @@ function seeOutput() {
 
   for (let i = 0; i < config.imgFormatedUrl.length; i++) {
     //Replace each ${} with respective sample data
-    var searchImage = input.search(config.imgFormatedUrl[i]); //Check if any ${} exist
+    // var searchImage = input.search(config.imgFormatedUrl[i]); //Check if any ${} exist
     var changeVariable = input
       .split(config.imgFormatedUrl[i])
       .join("<img src=" + config.imgUrl[i] + " style='max-width: 100%'>");
     input = changeVariable;
   }
-
-  if (searchString || searchImage) {
-    output.innerHTML = changeVariable;
-  } else {
-    output.innerHTML = input;
-  }
-
-  // change status to focus for input content
-  document.getElementById("input_content").focus();
+  input = JSON.stringify(input)
+  input = input.split("\\n").join("<br>")
+  input = input.split("\\r").join("")
+  output.innerHTML = JSON.parse(input);
 }
 
 new UploadCsv();

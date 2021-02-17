@@ -48,5 +48,5 @@ def convert_into_html(template, data, columns, **kwargs):
             output.append(line)
     output_html = ""
     for line in output:
-        output_html += line+"<br>"
+        output_html += line
     return output_html

@@ -5,9 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="index.css" />
     <link rel="stylesheet" href="email_content.css" />
+    <link rel="stylesheet" href="trix.css">
+    <script type="text/javascript" src="trix.js"></script>
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
     <title>Create E-mail Template</title>
   </head>
   <body>
+    <div class="instruction">
+      <strong>Instructions:</strong>
+
+      <p>1. Enter Email Subject and Email Content.</p>
+      <p>2. Download this <a href="/sample/targets.csv" download><strong>csv template</strong></a> and fill in the recipients emails (optional: add dynamic data).</p>
+      <p>3. Upload the csv file.</p>
+      <p>4. Upload image or attachment (if applicable).</p>
+      <p>5. Send!!!</p>
+    </div>
     <form
       enctype="multipart/form-data"
       class="card container"
@@ -16,23 +28,20 @@
       id="catcher"
     >
       <div class="email_subject">
-        <label for="email_subject">E-mail Subject:</label>
+        <label for="email_subject">Email Subject:</label>
         <input
           type="text"
           name="subject_field"
           id="subject_field"
+          onkeyup="checkEmptyField()"
           autofocus
-          required
         />
       </div>
       <div class="email_content">
-        <label for="email_content">E-mail Content:</label>
-        <textarea
-          name="content_field"
-          id="input_content"
-          oninput="seeOutput()"
-        ></textarea>
-        <div id="varFromCsv" class="var_from_csv"></div>
+        <label for="email_content">Email Content:</label>
+        <trix-editor input="x" class="trix-font-size" id="trixEditor"></trix-editor>
+        <div id="varFromCsv" class="var_from_csv">
+        </div>
         <div class="upload_csv">
           <label class="smaller_text">.csv file:</label>
           <input type="file" accept=".csv" id="dealCsv" name="targets_csv" />
@@ -67,16 +76,20 @@
         ></div>
       </div>
       <div class="button_holder send_button">
-        <input type="submit" value="test" name="submitBtn" id="testBtn" />
-        <input type="submit" value="send" name="submitBtn" />
+        <!-- <input type="submit" value="test" name="submitBtn" id="testBtn" /> -->
+        <p class="eror_msg" id="errorMsg">Please ensure <strong>Email Subject</strong> and <strong>Email Content</strong> are not empty as well as a <strong>.csv file</strong> with recipient's email are attached.</p>
+        <input type="submit" value="send" name="submitBtn" id="submitBtn" disabled />
       </div>
     </form>
+    
+    <script src="index.js"></script>
     <script src="config.js"></script>
     <script src="insertAtCaret.js"></script>
     <script src="uploadCsv.js"></script>
     <script src="uploadImg.js"></script>
     <script src="uploadAttachment.js"></script>
     <script src="showLoader.js"></script>
-    <script src="email_content.js"></script>
+    <script src="checkEmptyField.js"></script>
+    <script type="module" src="email_content.js"></script>
   </body>
 </html>

@@ -1,0 +1,1 @@
+var element = document.querySelector("trix-editor")

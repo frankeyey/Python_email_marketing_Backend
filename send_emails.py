@@ -11,7 +11,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.encoders import encode_base64
+from markdown2 import Markdown
 
+markdowner = Markdown(extras=["break-on-newline"])
 
 class sendEmailsHandler(tornado.web.RequestHandler):
     def post(self):
@@ -33,8 +35,9 @@ class sendEmailsHandler(tornado.web.RequestHandler):
             row = row.split(',')
             text, html = self.message_generator(row)
             receiver_email = row[int(self.get_csv_column_index('email'))]
+            cc_email = row[int(self.get_csv_column_index('cc'))]
             status = self.send_email(server, sender_email,
-                                     receiver_email, subject, text, html, row=row)
+                                     receiver_email, cc_email, subject, text, html, row=row)
             if not status:
                 break
         print("Done")
@@ -68,11 +71,12 @@ class sendEmailsHandler(tornado.web.RequestHandler):
     def message_generator(self, row):
         # yield message and receiver email (convert from template, return the output message)
         template = self.get_body_argument('content_field')
-
+        
         # text = template_converter.convert_into_text
         text = ""
+        html_content = markdowner.convert(template)
         html = template_converter.convert_into_html(
-            template=template, data=row, columns=self.get_csv_column(), media_files=self.request.files)
+            template=html_content, data=row, columns=self.get_csv_column(), media_files=self.request.files)
         return (text, html)
 
     def attach_media(self, message, **kwargs):
@@ -152,11 +156,12 @@ class sendEmailsHandler(tornado.web.RequestHandler):
                             print("Added attachment:", zip_namelist[j])
                             return
 
-    def send_email(self, server, sender_email, receiver_email, subject, text, html, **kwargs):
+    def send_email(self, server, sender_email, receiver_email, cc_email, subject, text, html, **kwargs):
         message = MIMEMultipart("alternative")
         message["Subject"] = subject
         message["From"] = sender_email
         message["To"] = receiver_email
+        message["Cc"] = cc_email
 
         # Turn these into plain/html MIMEText objects
         part1 = MIMEText(text, "plain")

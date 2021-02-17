@@ -18,6 +18,7 @@ class UploadCsv {
 
     }
     createHeaderBtn(data) {
+        document.getElementById("varFromCsv").innerHTML = ""
         let parsedata = [];
 
         let newLinebrk = data.split("\n");
@@ -42,11 +43,15 @@ class UploadCsv {
             button.id = i;
             button.value = tempHeader;
             button.onclick = function() {
-            insertAtCaret("input_content", formatedHeader);
-            seeOutput()
-            };
+            // insertAtCaret("input_content", formatedHeader, element);
+            element.editor.insertString(formatedHeader)
+            viewOutput()
+        };
             document.getElementById("varFromCsv").append(button);
         }
+
+        checkEmptyField()
+
         return this.Config.csvData, this.Config.csvHeader, this.Config.csvFormatedHeader;
     };
 }
