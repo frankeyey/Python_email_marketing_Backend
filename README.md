@@ -1,5 +1,15 @@
 # Python Email Marketing
 
+This project is originally from [pupubird](https://github.com/pupubird). I forked it and implemented a rich text editor from [Basecamp](https://github.com/basecamp) to provide some text formatting on the email content for current use.
+
+I use [Trix](https://github.com/basecamp/trix) as the editor because it provide intuitive UI as well as flexible functionality to programmatically access the editor instance.
+
+However, proper tests are not executed, some error handlings are not implemented yet, some bugs might appear while using the tool. I will try to fix that during my free time (if possible 😂).
+
+Below is the original README.
+
+***
+
 ## Table of Contents
 
 - [About](#about)
